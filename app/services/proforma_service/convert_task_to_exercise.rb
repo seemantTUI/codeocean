@@ -81,6 +81,7 @@ module ProformaService
         model_solution.files.map do |task_file|
           codeocean_file_from_task_file(task_file, model_solution).tap do |file|
             file.role ||= 'reference_implementation'
+            file.feedback_message = nil
           end
         end
       end
@@ -90,14 +91,14 @@ module ProformaService
       @task.files.reject {|file| file.id == 'ms-placeholder-file' }.map do |task_file|
         codeocean_file_from_task_file(task_file).tap do |file|
           file.role ||= 'regular_file'
+          file.feedback_message = nil
         end
       end
     end
 
     def codeocean_file_from_task_file(file, parent_object = nil)
       extension = File.extname(file.filename)
-
-      codeocean_file = CodeOcean::File.where(context: @exercise).where('xml_id_path = ? OR xml_id_path LIKE ?', file.id, "%/#{file.id}").first_or_initialize(context: @exercise)
+      codeocean_file = @exercise.files.where('array_length(xml_id_path, 1) IS NOT NULL AND xml_id_path[array_length(xml_id_path, 1)] = ?', file.id).first_or_initialize
       codeocean_file.assign_attributes(
         context: @exercise,
         file_type: file_type(extension),
@@ -106,7 +107,7 @@ module ProformaService
         read_only: file.usage_by_lms != 'edit',
         role: extract_meta_data(@task.meta_data&.dig('meta-data'), 'files', "CO-#{file.id}", 'role'),
         path: File.dirname(file.filename).in?(['.', '']) ? nil : File.dirname(file.filename),
-        xml_id_path: (parent_object.nil? ? '' : "#{parent_object.id}/") + file.id.to_s
+        xml_id_path: (parent_object.nil? ? [file.id] : [parent_object.id, file.id])
       )
       if file.binary
         codeocean_file.native_file = FileIO.new(file.content.dup.force_encoding('UTF-8'), File.basename(file.filename))

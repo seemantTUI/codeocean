@@ -558,20 +558,33 @@ RSpec.describe ProformaService::ConvertTaskToExercise do
         context 'when the files with correct xml_id_paths already exist' do
           let(:exercise) do
             create(:dummy,
+              unpublished: true,
               files: co_files,
               title: 'exercise-title',
               description: 'exercise-description')
           end
           let(:co_files) do
-            [create(:file, xml_id_path: 'id', role: 'regular_file'),
-             create(:file, xml_id_path: 'ms-id/ms-file-id', role: 'reference_implementation'),
-             create(:test_file, xml_id_path: 'test-id/test-file-id')]
+            [create(:file, xml_id_path: ['id'], role: 'regular_file'),
+             create(:file, xml_id_path: %w[ms-id ms-file-id], role: 'reference_implementation'),
+             create(:test_file, xml_id_path: %w[test-id test-file-id])]
           end
 
           it 'reuses existing file' do
             convert_to_exercise_service
-
+            exercise.save!
             expect(exercise.reload.files).to match_array(co_files)
+          end
+
+          context 'when files are move around' do
+            let(:files) { [test_file] }
+            let(:test_files) { [ms_file] }
+            let(:ms_files) { [file] }
+
+            it 'reuses existing file' do
+              convert_to_exercise_service
+              exercise.save!
+              expect(exercise.reload.files).to match_array(co_files)
+            end
           end
         end
       end
