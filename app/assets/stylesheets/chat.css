@@ -1,0 +1,91 @@
+/* For the conversation box, ensure it's scrollable and account for the prompt box's height */
+.conversation-box {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 180px; /* Default padding */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Ensure messages start from the bottom */
+}
+
+
+/* Ensure the user message box is rounded */
+.message.user-message .card {
+    border-radius: 15px !important; /* Force the border-radius to apply */
+}
+
+/* Bot icon color adjustment */
+.message.ai-message .fa-robot {
+    color: #ADD8E6; /* Very light blue */
+}
+
+/* Ensure the prompt box is rounded and scrollable when needed */
+.chat-input-fixed .form-control {
+    overflow-y: auto; /* Allow scroll when content exceeds height */
+    border-radius: 50px;
+}
+
+/* Chat input box is fixed at the bottom */
+.chat-input-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    padding: 10px 0;
+    z-index: 1000;
+}
+/* Chat container setup */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100h;
+}
+
+/* Conversation box setup */
+.conversation-box {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Prompt box styling */
+.chat-input {
+    background-color: white;
+    padding: 10px 0;
+}
+
+
+/* Message styling */
+.message {
+    margin-bottom: 10px;
+}
+
+.message:last-child {
+    margin-bottom: 20px; /* Extra space at the bottom for the last message */
+}
+
+/* Code block styling for dynamic resizing */
+pre {
+    background-color: #000; /* Black background for code */
+    color: #fff; /* White text */
+    padding: 15px; /* Larger padding for better spacing */
+    border-radius: 8px; /* Rounded corners */
+    white-space: pre-wrap; /* Wrap text when needed */
+    word-break: break-word; /* Break long words */
+    font-family: monospace; /* Monospace font for code */
+    font-size: 1rem; /* Comfortable font size */
+    max-width: 100%; /* Ensure the code block doesn't exceed container width */
+    display: block; /* Ensure block-level display to fill width */
+    margin-bottom: 10px; /* Add margin after the code block */
+    overflow: visible; /* Allow the box to expand as needed */
+    max-height: none; /* Ensure no vertical scroll */
+}
+
+/* Ensure the content inside the code block wraps and expands dynamically */
+code {
+    white-space: pre-wrap; /* Ensure text wraps */
+    display: block;
+    height: auto; /* Let the height adjust based on content */
+    max-height: none; /* Remove any height constraints */
+}
+

@@ -1,0 +1,12 @@
+/ Modal for AI feedback
+#aiFeedbackModal.modal.fade tabindex="-1" role="dialog" aria-labelledby="aiFeedbackModalLabel" aria-hidden="true"
+  .modal-dialog.modal-dialog-centered role="document"
+    .modal-content
+      .modal-header
+        h5.modal-title id="aiFeedbackModalLabel" = "Feedback from AI"
+        button.close type="button" data-bs-dismiss="modal" aria-label="Close"
+          span aria-hidden="true" = "&times;"
+      .modal-body
+        p#ai-feedback-message = "Loading feedback..."
+      .modal-footer
+        button.btn.btn-secondary type="button" data-bs-dismiss="modal" = "Close"

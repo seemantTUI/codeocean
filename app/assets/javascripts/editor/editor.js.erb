@@ -52,6 +52,7 @@ var CodeOceanEditor = {
         }
     },
 
+
     confirmResetActiveFile: function (event) {
         event.preventDefault();
         const initiator = $(event.target.closest("button"));
@@ -490,7 +491,7 @@ var CodeOceanEditor = {
         $('#start-over-active-file').unbind('click');
     },
 
-    initializeRequestForComments: function () {
+        initializeRequestForComments: function () {
         var button = $('#requestComments');
         button.prop('disabled', true);
         button.on('click', function () {
@@ -515,10 +516,39 @@ var CodeOceanEditor = {
         }.bind(this), this.REQUEST_FOR_COMMENTS_DELAY);
     },
 
+    initializeRequestAIForComments: function () {
+        var button = $('#askFromAIButton');
+        button.prop('disabled', true);
+        button.on('click', function () {
+            button.tooltip('hide');
+            $('#rfc_intervention_text').hide();
+            new bootstrap.Modal($('#comment-modal')).show();
+        });
+
+        // Ask AI button (same behavior as ask for comments)
+        $('#askFromAIButton').one('click', this.requestComments.bind(this));
+        $('#closeAskForCommentsButton').on('click', function () {
+            bootstrap.Modal.getInstance($('#comment-modal')).hide();
+        });
+
+        setTimeout(function () {
+            button.prop('disabled', false);
+            setTimeout(function () {
+                button.tooltip('show');
+                setTimeout(function () {
+                    button.tooltip('hide');
+                }, this.REQUEST_TOOLTIP_TIME);
+            }, this.REQUEST_TOOLTIP_DELAY);
+        }.bind(this), this.REQUEST_FOR_COMMENTS_DELAY);
+    },
+
     teardownRequestForComments: function () {
         $('#requestComments').unbind('click');
         $('#askForCommentsButton').unbind('click');
-        $('#closeAskForCommentsButton').unbind('click');
+        $('#askFromAIButton').unbind('click');
+        $('#closeAskForCommentsButton').unbind('click')
+
+
     },
 
     isActiveFileRenderable: function () {
@@ -555,6 +585,7 @@ var CodeOceanEditor = {
             card.find('.attribute-row.row').eq(1).addClass('d-none');
         }
         card.find('.row .col-md-9').eq(2).html(result.message);
+
 
         // Add error message from code to card
         if (result.error_messages) {
@@ -1112,5 +1143,7 @@ var CodeOceanEditor = {
         window.addEventListener("beforeunload", this.autosaveIfChanged.bind(this));
         // create autosave when the editor is opened the first time
         this.autosave();
-    }
+    },
+
+
 };

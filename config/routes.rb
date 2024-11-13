@@ -22,6 +22,8 @@ Rails.application.routes.draw do
       get :mark_as_solved, defaults: {format: :json}
       post :set_thank_you_note, defaults: {format: :json}
       post :clear_question
+      get :chat_with_ai
+      post :chat_with_ai
     end
   end
   resources :comments, defaults: {format: :json}
@@ -174,6 +176,7 @@ Rails.application.routes.draw do
 
   post '/evaluate', to: 'remote_evaluation#evaluate', defaults: {format: :json}
   post '/submit', to: 'remote_evaluation#submit', defaults: {format: :json}
+  resources :testrun_feedback_message, only: :show
 
   resources :ping, only: :index, defaults: {format: :json}
 

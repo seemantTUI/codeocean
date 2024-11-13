@@ -1,4 +1,4 @@
-CodeOceanEditorEvaluation = {
+var CodeOceanEditorEvaluation = {
     // A list of non-printable characters that are not allowed in the code output.
     // Taken from https://stackoverflow.com/a/69024306
     nonPrintableRegEx: /[\u0000-\u0008\u000B\u000C\u000F-\u001F\u007F-\u009F\u2000-\u200F\u2028-\u202F\u205F-\u206F\u3000\uFEFF]/g,
@@ -293,5 +293,35 @@ CodeOceanEditorEvaluation = {
 
             $(ul).insertAfter($(deadline).children()[0]);
         }
+    },
+
+    /**
+     * Fetch AI Feedback Message
+     */
+    fetchFeedbackMessage: function (testrunId) {
+        $.ajax({
+            url: `/testruns/${testrunId}/feedback_message`,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                // Populate the modal's feedback message element with the response
+                $('#feedback-message').text(data.feedback_message || "No feedback message available.");
+            },
+            error: function () {
+                $('#feedback-message').text("Error loading feedback message.");
+            }
+        });
     }
 };
+
+// Event listener for Feedback from AI button
+$(document).on('click', '#askFromAIButton', function (event) {
+    event.preventDefault();
+    const testrunId = $(this).data('testrun-id'); // Assume `testrunId` is stored as a data attribute
+
+    // Call fetchFeedbackMessage with the testrun ID
+    CodeOceanEditorEvaluation.fetchFeedbackMessage(testrunId);
+
+    // Open the modal
+    new bootstrap.Modal($('#aiFeedbackModal')).show();
+});

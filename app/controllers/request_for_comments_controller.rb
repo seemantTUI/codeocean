@@ -28,6 +28,7 @@ class RequestForCommentsController < ApplicationController
     authorize!
   end
 
+
   # GET /my_request_for_comments
   def my_comment_requests
     @search = ransack_search do |rfcs|
@@ -128,6 +129,142 @@ class RequestForCommentsController < ApplicationController
     authorize!
   end
 
+
+  def chat_with_ai
+    @request_for_comment = RequestForComment.find(params[:id])
+    authorize @request_for_comment # Ensure authorization
+
+    # Fetch the conversation history for display
+    @conversation_history = @request_for_comment.ai_conversation_histories.order(:created_at)
+
+    # Helper to split messages into parts (text/code
+
+    # Process the conversation history to include split messages
+    @split_conversation = @conversation_history.map do |conversation|
+      {
+        role: conversation.role,
+        parts: split_message(conversation.message)
+      }
+    end
+
+    # Construct the initial prompt with exercise, file, and question information
+    file = CodeOcean::File.find(@request_for_comment.file_id)
+    question = @request_for_comment.question.presence || "The author did not enter a question for this request."
+    constructed_prompt = construct_prompt(file, question)
+
+    # Check if this is the first time or if the ai_response exists but conversation history hasn't been saved
+    if @request_for_comment.ai_conversation_histories.where(role: 'system').blank?
+      begin
+        # Save the system message to the conversation history (constructed prompt)
+        @request_for_comment.ai_conversation_histories.create!(
+          message: constructed_prompt,
+          role: 'system',
+          user_id: current_user.id
+        )
+
+        # Check if ai_response is already present, if so, add it to the history
+        # if @request_for_comment.ai_response.present? and @request_for_comment.ai_conversation_histories.where(role: 'assistant').blank?
+        #   # Save the existing AI response to the conversation history
+        #   @request_for_comment.ai_conversation_histories.create!(
+        #     message: @request_for_comment.ai_response,
+        #     role: 'assistant',
+        #     user_id: current_user.id
+        #   )
+        # else if
+        #   # Send the conversation history to ChatGPT and get the initial response
+        #   messages = @request_for_comment.ai_conversation_histories.order(:created_at).map do |conversation|
+        #     { role: conversation.role, content: conversation.message }
+        #   end
+        #
+        #   gpt_service = ChatGptRequest.new
+        #   @ai_response = gpt_service.request_gpt_with_history(messages)
+        #
+        #   # Save the AI's response to the conversation history
+        #   @request_for_comment.ai_conversation_histories.create!(
+        #     message: @ai_response,
+        #     role: 'assistant',
+        #     user_id: current_user.id
+        #   )
+        #
+        #   # Save the response to the request_for_comment object
+        #   @request_for_comment.update(ai_response: @ai_response)
+        # end
+
+        # Refresh the conversation history and process it
+        @conversation_history = @request_for_comment.ai_conversation_histories.order(:created_at)
+        @split_conversation = @conversation_history.map do |conversation|
+          {
+            role: conversation.role,
+            parts: split_message(conversation.message)
+          }
+        end
+      rescue => e
+        # Handle any errors with the ChatGPT service
+        @error = "There was an error processing your request: #{e.message}"
+      end
+    end
+
+    # Check if the user provided a new prompt via the form
+    prompt = params[:prompt]
+
+    if prompt.present?
+      begin
+        # Save the user's prompt to the conversation history
+        @request_for_comment.ai_conversation_histories.create!(
+          message: prompt,
+          role: 'user',
+          user_id: current_user.id
+        )
+
+        # Prepare the conversation messages for ChatGPT
+        messages = @request_for_comment.ai_conversation_histories.order(:created_at).map do |conversation|
+          { role: conversation.role, content: conversation.message }
+        end
+
+        # Send the conversation history to ChatGPT and get a new response
+        gpt_service = ChatGptRequest.new
+        @ai_response = gpt_service.request_gpt_with_history(messages)
+
+        # Save the AI's response to the conversation history
+        @request_for_comment.ai_conversation_histories.create!(
+          message: @ai_response,
+          role: 'assistant',
+          user_id: current_user.id
+        )
+
+        # Optionally update the latest AI response in the request_for_comment object
+        @request_for_comment.update(ai_response: @ai_response)
+
+        # Refresh the conversation history and process it
+        @conversation_history = @request_for_comment.ai_conversation_histories.order(:created_at)
+        @split_conversation = @conversation_history.map do |conversation|
+          {
+            role: conversation.role,
+            parts: split_message(conversation.message)
+          }
+        end
+      rescue => e
+        # Handle any errors with the ChatGPT service
+        @error = "There was an error processing your request: #{e.message}"
+      end
+    end
+
+    # Render the chat_with_ai view
+    render :chat_with_ai
+  end
+  def split_message(message)
+    parts = message.split("```")
+    parts.map.with_index do |part, index|
+      { type: (index.even? ? 'text' : 'code'), content: part }
+    end
+  end
+
+
+
+
+
+
+
   # POST /request_for_comments.json
   def create
     # Consider all requests as JSON
@@ -164,11 +301,49 @@ class RequestForCommentsController < ApplicationController
   end
 
   private
+  def send_to_chatgpt_and_create_comment(request_for_comment)
+    submission = request_for_comment.submission
+    file = submission.files.first
+
+    # Send the question to ChatGPT and get the response
+    gpt_service = ChatGptRequest.new
+    begin
+      gpt_response = gpt_service.request_gpt(request_for_comment)
+      Comment.create!(
+        text: gpt_response,
+        file_id: file.id,
+        row: '0',
+        column: '0',
+        user: current_user
+      )
+      flash[:notice] = "sucess" # Display success message
+    rescue StandardError => e
+      Rails.logger.debug { "Error creating comment or ChatGPT request failed: #{e.message}" }
+      flash[:alert] = "error" # Display error message
+      return # Stop further execution if it fails
+      # params = {
+      #   text: "gpt_response",
+      #   file_id: file.id,
+      #   row: '0',
+      #   column: '0',
+      #   user: current_user
+      # }
+      # redirect_to comments_path, method: :post, params: params
+      # @request_for_comment.update(ai_response: gpt_response)
+      # @request_for_comment.ai_conversation_histories.create!(
+      #   message: @request_for_comment.ai_response,
+      #   role: 'assistant',
+      #   user_id: current_user.id
+      # )
+    end
+  end
+
 
   # Use callbacks to share common setup or constraints between actions.
   def set_request_for_comment
     @request_for_comment = RequestForComment.includes(:exercise, :user, submission: [:study_group, {files: [:file_type], testruns: [:testrun_messages, {file: [:file_type]}]}]).find(params[:id])
   end
+
 
   def request_for_comment_params
     # The study_group_id might not be present in the session (e.g. for internal users), resulting in session[:study_group_id] = nil which is intended.

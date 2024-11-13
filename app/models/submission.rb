@@ -305,6 +305,9 @@ class Submission < ApplicationRecord
       waiting_for_container_time: output[:waiting_for_container_time]
     )
     TestrunMessage.create_for(testrun, output[:messages])
+    TestrunExecutionEnvironment.create(testrun:, execution_environment: @used_execution_environment)
+    # Generate feedback messages with ChatGPT and save the
+    #TestrunFeedbackMessage.create_for(testrun, output, assessment, main_file, collect_files.detect(&:reference_implementation?))
 
     filename = file.filepath
 
@@ -317,15 +320,21 @@ class Submission < ApplicationRecord
     end
 
     output.merge!(assessment)
-    output.merge!(filename:, message: feedback_message(file, output), weight: file.weight, hidden_feedback: file.hidden_feedback)
+    output.merge!(filename:, message: feedback_message(file, output, testrun), weight: file.weight, hidden_feedback: file.hidden_feedback)
     output.except!(:messages)
   end
 
-  def feedback_message(file, output)
+  def feedback_message(file, output, testrun)
     if output[:score] == Assessor::MAXIMUM_SCORE && output[:file_role] == 'teacher_defined_test'
       I18n.t('exercises.implement.default_test_feedback')
     elsif output[:score] == Assessor::MAXIMUM_SCORE && output[:file_role] == 'teacher_defined_linter'
       I18n.t('exercises.implement.default_linter_feedback')
+    elsif (existing_feedback = TestrunFeedbackMessage.find_by(testrun: testrun)).present?
+      ActionController::Base.helpers.sanitize(
+        Kramdown::Document.new(existing_feedback.feedback_message, smart_quotes: 'apos,apos,quot,quot').to_html,
+        tags: %w[strong],
+        attributes: []
+      )
     else
       # The render_markdown method from application_helper.rb is not available in model classes.
       ActionController::Base.helpers.sanitize(

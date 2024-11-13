@@ -1,0 +1,51 @@
+.container.chat-container.d-flex.flex-column
+  .row.flex-grow-1
+    .col-md-8.offset-md-2.d-flex.flex-column
+      / Display conversation history
+      .conversation-box.p-3.rounded.overflow-auto.flex-grow-1#conversation-box
+        - if @split_conversation.present?
+          - @split_conversation.each do |conversation|
+            - if conversation[:role] == 'user'
+              .message.user-message.mb-3.text-right.clearfix
+                .card.bg-light.border-0.rounded.d-inline-block.text-wrap(style="max-width: 75%; font-size: 0.875rem; float: right; word-wrap: break-word; overflow-wrap: break-word;")
+                  .card-body.p-2
+                    // Iterate over parts of the conversation (text and code)
+                    - conversation[:parts].each do |part|
+                      - if part[:type] == 'text'
+                        p(style="white-space: pre-wrap; margin-bottom: 10px;")= part[:content].strip
+                      - elsif part[:type] == 'code'
+                        pre
+                          code= part[:content].strip
+            - elsif conversation[:role] == 'assistant'
+              .message.ai-message.mb-3.text-left.clearfix
+                .card.border-0.rounded.d-inline-block.text-wrap(style="max-width: 75%; font-size: 0.875rem; float: left; word-wrap: break-word; overflow-wrap: break-word;")
+                  .card-body.p-2
+                    i.fa-solid.fa-robot.fa-2x.me-2(style="color: #87CEEB;")
+                    // Iterate over parts of the conversation (text and code)
+                    - conversation[:parts].each do |part|
+                      - if part[:type] == 'text'
+                        p(style="white-space: pre-wrap; margin-bottom: 10px;")= part[:content].strip
+                      - elsif part[:type] == 'code'
+                        pre(style="background-color: #f5f5f5; color: #333; padding: 10px; border-radius: 5px; text-align: left; margin-top: 10px; white-space: pre-wrap; overflow-x: auto; word-break: break-word;")
+                          code(style="white-space: pre-wrap; display: block;")= part[:content].strip
+        - else
+          p.text-muted.mt-3.text-center No conversation history yet.
+
+      / Prompt box at the bottom within the same column
+      .chat-input.mt-auto
+        = form_with(url: chat_with_ai_request_for_comment_path(@request_for_comment), method: :post, local: true, html: { class: 'chat-form mb-0' }) do |f|
+          .form-group.mb-0
+            .input-group.rounded-pill
+              = f.text_area :prompt, id: 'prompt-input', rows: 1, class: 'form-control rounded-pill', placeholder: 'Type your message...', style: 'resize: none; overflow-y: auto; max-height: 200px;'
+              .input-group-append
+                button.btn.btn-outline-primary.rounded-pill#send-ai-button(type='submit' aria-label='Send')
+                  i.fa-solid.fa-arrow-right
+
+          / Small disclaimer below the prompt box
+          .small.text-muted.mt-1.mb-0.text-center
+            | AI can make mistakes. Please also refer to instructors.
+
+    / Handle error messages if any
+    - if @error.present?
+      .alert.alert-danger.mt-3
+        p= @error

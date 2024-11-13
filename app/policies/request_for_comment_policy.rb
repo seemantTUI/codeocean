@@ -58,6 +58,11 @@ class RequestForCommentPolicy < ApplicationPolicy
     end
   end
 
+  def chat_with_ai?
+    # Define the conditions under which the user is allowed to access the action
+    @user.present?
+  end
+
   class Scope < Scope
     def resolve
       if @user.admin?

@@ -6,6 +6,7 @@ class Testrun < ApplicationRecord
   belongs_to :submission
   belongs_to :testrun_execution_environment, optional: true, dependent: :destroy
   has_many :testrun_messages, dependent: :destroy
+  has_one :testrun_feedback_messages, dependent: :destroy
 
   CONSOLE_OUTPUT = %w[stdout stderr].freeze
   CAUSES = %w[assess run].freeze

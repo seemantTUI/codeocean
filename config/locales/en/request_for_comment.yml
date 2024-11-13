@@ -33,10 +33,12 @@ en:
       my_rfc_activity: My Comment Activity
       rfcs_for_exercise: Exercise Comments
       rfcs_with_my_comments: Requests for Comments I have commented on
+      chat_with_ai: "Chat with AI"
       study_groups:
         current: Current Study Group
         my: My Study Groups
         placeholder: Study group
+
     mark_as_solved: Mark this question as answered
     modal_title: Add a comment to line %{line}
     no_output: No output.
@@ -52,3 +54,5 @@ en:
     subscribe_to_author: Receive E-Mail notifications for new comments of the original author
     test_results: Test Results
     write_a_thank_you_node: 'If you want, you can write a thank you note to all your commenters:'
+
+

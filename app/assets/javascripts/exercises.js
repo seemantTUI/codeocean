@@ -497,6 +497,25 @@ $(document).on('turbolinks:load', function () {
         initializeEditors();
         $('.frame').show();
     }
+    document.addEventListener("DOMContentLoaded", function() {
+        $('#aiFeedbackModal').on('show.bs.modal', function() {
+            // Clear any existing content and set loading message
+            $('#ai-feedback-message').text("Loading feedback...");
+
+            // Fetch the feedback message via AJAX
+            $.ajax({
+                url: '/feedback/' + $('#ai-feedback-link').data('testrun-id'), // Ensure `testrun_id` is set in data
+                method: 'GET',
+                dataType: 'html',
+                success: function(response) {
+                    $('#ai-feedback-message').html(response);
+                },
+                error: function() {
+                    $('#ai-feedback-message').text("An error occurred while loading the feedback.");
+                }
+            });
+        });
+    });
 
 
 });

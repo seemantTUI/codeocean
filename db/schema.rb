@@ -16,6 +16,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_07_004238) do
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
+  create_table "ai_conversation_histories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "request_for_comment_id", null: false
+    t.text "message"
+    t.string "role"
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["request_for_comment_id"], name: "index_ai_conversation_histories_on_request_for_comment_id"
+  end
+
   create_table "anomaly_notifications", id: :serial, force: :cascade do |t|
     t.integer "contributor_id", null: false
     t.string "contributor_type", null: false
@@ -472,6 +482,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_07_004238) do
     t.text "thank_you_note"
     t.boolean "full_score_reached", default: false
     t.integer "times_featured", default: 0
+    t.text "ai_response"
     t.index ["exercise_id", "created_at"], name: "index_unresolved_recommended_rfcs", where: "(((NOT solved) OR (solved IS NULL)) AND ((question IS NOT NULL) AND (question <> ''::text)))"
     t.index ["exercise_id"], name: "index_request_for_comments_on_exercise_id"
     t.index ["submission_id"], name: "index_request_for_comments_on_submission_id"
@@ -579,6 +590,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_07_004238) do
     t.index ["testrun_id"], name: "index_testrun_execution_environments_on_testrun_id"
   end
 
+  create_table "testrun_feedback_messages", force: :cascade do |t|
+    t.bigint "testrun_id", null: false
+    t.text "feedback_message", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["testrun_id"], name: "index_testrun_feedback_messages_on_testrun_id"
+  end
+
   create_table "testrun_messages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.bigint "testrun_id", null: false
     t.interval "timestamp", default: "PT0S", null: false
@@ -666,6 +685,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_07_004238) do
     t.index ["user_type", "user_id"], name: "index_user_proxy_exercise_exercises_on_user"
   end
 
+  add_foreign_key "ai_conversation_histories", "request_for_comments"
   add_foreign_key "anomaly_notifications", "exercise_collections"
   add_foreign_key "anomaly_notifications", "exercises"
   add_foreign_key "authentication_tokens", "study_groups"
@@ -703,6 +723,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_07_004238) do
   add_foreign_key "subscriptions", "study_groups"
   add_foreign_key "testrun_execution_environments", "execution_environments"
   add_foreign_key "testrun_execution_environments", "testruns"
+  add_foreign_key "testrun_feedback_messages", "testruns"
   add_foreign_key "testrun_messages", "testruns"
   add_foreign_key "testruns", "submissions"
   add_foreign_key "tips", "file_types"

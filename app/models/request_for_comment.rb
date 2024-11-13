@@ -16,6 +16,7 @@ class RequestForComment < ApplicationRecord
 
   has_many :comments, through: :submission
   has_many :subscriptions, dependent: :destroy
+  has_many :ai_conversation_histories, dependent: :destroy
 
   scope :unsolved, -> { where(solved: [false, nil]) }
   scope :in_range, ->(from, to) { from == DateTime.new(0) && to > 5.seconds.ago ? all : where(created_at: from..to) }

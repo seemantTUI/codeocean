@@ -27,6 +27,8 @@ h1 = RequestForComment.model_name.human(count: :other)
         th = RequestForComment.human_attribute_name('question')
         th
           i.fa-solid.fa-comment aria-hidden='true' title = t('request_for_comments.comments') align='center'
+        th
+          i.fa-solid.fa-robot.ms-2 aria-hidden='true' style="color: #87CEEB;"
         th = RequestForComment.human_attribute_name('username')
         th.sorttable_nosort = sort_link(@search, :created_at, RequestForComment.human_attribute_name('requested_at'))
         th = RequestForComment.human_attribute_name('last_update')
@@ -47,6 +49,7 @@ h1 = RequestForComment.model_name.human(count: :other)
           - else
             td = '-'
           td = request_for_comment.comments.size
+          td = request_for_comment.ai_conversation_length || 0
           td = link_to_if(request_for_comment.user && policy(request_for_comment.user).show?, request_for_comment.user.displayname, request_for_comment.user)
           td = t('shared.time.before', time: distance_of_time_in_words_to_now(request_for_comment.created_at))
           td = t('shared.time.before', time: distance_of_time_in_words_to_now(request_for_comment.last_activity.nil? ? request_for_comment.updated_at : request_for_comment.last_activity))

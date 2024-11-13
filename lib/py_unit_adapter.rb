@@ -46,5 +46,12 @@ class PyUnitAdapter < TestingFrameworkAdapter
     end
 
     {count:, failed: total_failed, error_messages: assertion_error_matches.flatten.compact_blank.sort}.compact_blank
+    # chat_gpt_request = ChatGptRequest.new
+    # prompt = output[:stderr]
+    # response = chat_gpt_request.request_gpt(prompt)
+    # line_length = 50
+    # para = response.scan(/.{1,#{line_length}}/).join("\n")
+    # output[:stderr] = para
+    {count:, failed: failed + errors, error_messages: assertion_error_matches.flatten.compact_blank}
   end
 end

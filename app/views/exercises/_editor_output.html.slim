@@ -32,6 +32,8 @@
                 = row(label: 'exercises.implement.feedback')
                 = row(label: 'exercises.implement.error_messages')
                 /= row(label: 'exercises.implement.output', value: link_to(t('shared.show'), '#'))
+                = row(label: 'exercises.implement.output') do
+                  = link_to 'Feedback from AI', '#', data: { 'bs-toggle': 'modal', 'bs-target': '#aiFeedbackModal' }, onclick: 'fetchFeedbackMessage(event)'
           ul#linter-dummies.d-none.list-unstyled
             li.card.mt-2
               .card-header.py-2
@@ -84,3 +86,34 @@
         #flowrHint.mb-2.card data-url=CodeOcean::Config.new(:code_ocean).read[:flowr][:url] role='tab'
           .card-header.text-white.bg-info = t('exercises.implement.flowr.heading')
           .card-body
+
+/ Modal Structure
+.modal.fade#aiFeedbackModal tabindex='-1' role='dialog' aria-labelledby='aiFeedbackModalLabel' aria-hidden='true'
+  .modal-dialog role='document'
+    .modal-content
+      .modal-header
+        h5.modal-title#aiFeedbackModalLabel Feedback from AI
+        button.close type='button' data-bs-dismiss='modal' aria-label='Close'
+          span aria-hidden='true' &times;
+      .modal-body
+        p#feedback-message Loading feedback...
+      .modal-footer
+        button.btn.btn-secondary type='button' data-bs-dismiss='modal' Close
+
+/ JavaScript only for this page
+- content_for :javascript do
+  script
+    | function fetchFeedbackMessage(event) {
+    |   event.preventDefault();
+    |   const testrunId = @testrun.id;
+    |
+    |   fetch(`/testrun_feedback_message/${testrunId}`)
+    |     .then(response => response.text())
+    |     .then(data => {
+    |       document.getElementById('feedback-message').innerHTML = data;
+    |     })
+    |     .catch(error => {
+    |       console.error('Error fetching feedback message:', error);
+    |       document.getElementById('feedback-message').innerHTML = 'Failed to load feedback.';
+    |     });
+    | }
