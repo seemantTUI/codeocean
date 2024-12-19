@@ -1,0 +1,61 @@
+{
+  "type": "json_schema",
+  "json_schema": {
+    "name": "general_comments_schema",
+    "strict": true,
+    "schema": {
+      "type": "object",
+      "properties": {
+        "requirements": {
+          "type": "array",
+          "description": "A list of comments fulfilling specific requirements.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement_number": {
+                "type": "integer",
+                "description": "The requirement number (6 to 11) from the input prompt."
+              },
+              "comment": {
+                "type": "string",
+                "description": "The comment fulfilling the specified requirement."
+              }
+            },
+            "required": [
+              "requirement_number",
+              "comment"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "line_specific_comments": {
+          "type": "array",
+          "description": "Comments specific to certain lines in the student's code.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "line_number": {
+                "type": "integer",
+                "description": "The line number where the comment applies."
+              },
+              "comment": {
+                "type": "string",
+                "description": "The specific comment for that line."
+              }
+            },
+            "required": [
+              "line_number",
+              "comment"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "requirements",
+        "line_specific_comments"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

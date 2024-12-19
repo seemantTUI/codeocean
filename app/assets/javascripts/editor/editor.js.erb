@@ -547,6 +547,7 @@ var CodeOceanEditor = {
         card.find('.card-title .number').text(index + 1);
         card.find('.row .col-md-9').eq(0).find('.number').eq(0).text(result.passed);
         card.find('.row .col-md-9').eq(0).find('.number').eq(1).text(result.count);
+        card.attr('data-testrun-id', result.testrun_id); // Add testrun_id to the card
         if (result.weight !== 0) {
             card.find('.row .col-md-9').eq(1).find('.number').eq(0).text(parseFloat((result.score * result.weight).toFixed(2)));
             card.find('.row .col-md-9').eq(1).find('.number').eq(1).text(result.weight);
@@ -555,6 +556,10 @@ var CodeOceanEditor = {
             card.find('.attribute-row.row').eq(1).addClass('d-none');
         }
         card.find('.row .col-md-9').eq(2).html(result.message);
+        if (result.testrun_id) {
+            const aiFeedbackLink = card.find('.ai-feedback-link');
+            aiFeedbackLink.data('testrun_id', result.testrun_id);
+        }
 
         // Add error message from code to card
         if (result.error_messages) {

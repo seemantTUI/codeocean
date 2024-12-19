@@ -21,6 +21,7 @@ class SubmissionsController < ApplicationController
   before_action :require_user!, except: :render_file
   # We want to serve .js files without raising a `ActionController::InvalidCrossOriginRequest` exception
   skip_before_action :verify_authenticity_token, only: %i[render_file download_file]
+  skip_after_action :verify_authorized, only: :testrun_ai_feedback_message
 
   def index
     @search = policy_scope(Submission).ransack(params[:q])
@@ -330,6 +331,19 @@ class SubmissionsController < ApplicationController
     save_testrun_output 'assess'
   ensure
     kill_client_socket(client_socket)
+  end
+
+  def testrun_ai_feedback_message
+    testrun = Testrun.find(params[:testrun_id])
+
+    # Use the generate_feedback method from the Testrun model
+    feedback_message = testrun.generate_ai_feedback
+
+    if feedback_message.present?
+      render plain: feedback_message, status: :ok
+    else
+      render plain: 'Failed to generate feedback.', status: :unprocessable_entity
+    end
   end
 
   private

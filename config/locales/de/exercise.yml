@@ -5,6 +5,8 @@ de:
       exercise:
         allow_auto_completion: Autovervollständigung aktivieren
         allow_file_creation: Dateierstellung erlauben
+        allow_ai_comment_for_rfc: AI-Kommentar für RFC zulassen
+        allow_ai_feedback_on_score: Erlaube KI-Feedback zur Bewertung
         average_score_percentage: Durchschnittliche Bewertung in Prozent
         description: Beschreibung
         distinct_final_submissions: Endgültige Abgaben
@@ -38,6 +40,7 @@ de:
       file_root: Erstellte Dateien
       gone: Die angeforderte Datei konnte nicht abgerufen werden. Erstellte Dateien werden nur kurzzeitig vorgehalten und dann gelöscht. Bitte führen Sie den Code erneut aus und versuchen Sie dann wieder den Download der Datei.
     editor:
+      chat_gpt_disclaimer: Dieser Kommentar wird von ChatGPT generiert. Bitte antworten Sie nicht auf diesen Kommentar.
       collapse_action_sidebar: Aktions-Leiste Einklappen
       collapse_output_sidebar: Ausgabe-Leiste Einklappen
       confirm_start_over: Wollen Sie in dieser Aufgabe wirklich von vorne anfangen? Ihre bisherigen Änderungen in dieser Aufgabe werden entfernt; andere Aufgaben bleiben unverändert. Diese Aktion kann nicht rückgängig gemacht werden.
@@ -159,6 +162,7 @@ de:
       error_hints:
         heading: Hinweise
       error_messages: Fehlermeldungen
+      request_feedback_from_ai: Fordern Sie Feedback von AI an
       existing_programming_group: Sie arbeiten gerade an der Übung mit dem Titel '%{exercise}' als Teil einer Programmiergruppe. Bitte schließen Sie Ihre Arbeit dort ab, bevor Sie mit der Bearbeitung dieser Übung beginnen.
       exit_failure: Die letzte Code-Ausführung wurde mit einem Fehler beendet (Statuscode %{exit_code}).
       exit_successful: Die letzte Code-Ausführung wurde erfolgreich beendet (Statuscode %{exit_code}).

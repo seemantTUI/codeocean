@@ -54,10 +54,18 @@
     label.form-check-label
       = f.check_box(:allow_file_creation, class: 'form-check-input')
       = f.label(:allow_file_creation, class: 'form-label mb-0')
-  .form-check.mb-3
+  .form-check
     label.form-check-label
       = f.check_box(:allow_auto_completion, class: 'form-check-input')
       = f.label(:allow_auto_completion, class: 'form-label mb-0')
+  .form-check
+    label.form-check-label
+      = f.check_box(:allow_ai_comment_for_rfc, class: 'form-check-input')
+      = f.label(:allow_ai_comment_for_rfc, class: 'form-label mb-0')
+  .form-check
+    label.form-check-label
+      = f.check_box(:allow_ai_feedback_on_score, class: 'form-check-input')
+      = f.label(:allow_ai_feedback_on_score, class: 'form-label mb-0')
   .mb-3
     = f.label(:expected_difficulty, class: 'form-label')
     = f.number_field :expected_difficulty, in: 1..10, step: 1, class: 'form-control'

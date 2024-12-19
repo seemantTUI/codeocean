@@ -163,6 +163,7 @@ Rails.application.routes.draw do
       get :finalize
     end
   end
+  post '/submissions/testrun_ai_feedback', to: 'submissions#testrun_ai_feedback_message', as: 'testrun_ai_feedback'
 
   resources :study_groups, only: %i[index show edit destroy update] do
     member do

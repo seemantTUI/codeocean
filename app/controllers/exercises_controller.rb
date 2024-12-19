@@ -209,6 +209,8 @@ class ExercisesController < ApplicationController
                              :hide_file_tree,
                              :allow_file_creation,
                              :allow_auto_completion,
+                             :allow_ai_comment_for_rfc,
+                             :allow_ai_feedback_on_score,
                              :title,
                              :internal_title,
                              :expected_difficulty,

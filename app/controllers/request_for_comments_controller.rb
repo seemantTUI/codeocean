@@ -154,6 +154,9 @@ class RequestForCommentsController < ApplicationController
           format.json { render json: {danger: t('exercises.editor.depleted'), status: :container_depleted}, status: :service_unavailable }
         else
           format.json { render :show, status: :created, location: @request_for_comment }
+          if @request_for_comment.submission.exercise.allow_ai_comment_for_rfc
+            GenerateAutomaticCommentsJob.perform_later(@request_for_comment, current_user)
+          end
         end
       else
         format.html { render :new }

@@ -31,6 +31,12 @@
                     | 0
                 = row(label: 'exercises.implement.feedback')
                 = row(label: 'exercises.implement.error_messages')
+                br
+                - if @exercise.allow_ai_feedback_on_score
+                  = link_to t('exercises.implement.request_feedback_from_ai'), '#',
+                          class: 'btn btn-primary btn-sm px-2 py-1 ai-feedback-link d-inline-block',
+                          data: { testrun_id: '' },
+                          id: 'ai-feedback-link'
                 /= row(label: 'exercises.implement.output', value: link_to(t('shared.show'), '#'))
           ul#linter-dummies.d-none.list-unstyled
             li.card.mt-2

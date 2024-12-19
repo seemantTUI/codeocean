@@ -317,7 +317,7 @@ class Submission < ApplicationRecord
     end
 
     output.merge!(assessment)
-    output.merge!(filename:, message: feedback_message(file, output), weight: file.weight, hidden_feedback: file.hidden_feedback)
+    output.merge!(filename:, message: feedback_message(file, output), weight: file.weight, hidden_feedback: file.hidden_feedback, testrun_id: testrun.id)
     output.except!(:messages)
   end
 
