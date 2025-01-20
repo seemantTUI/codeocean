@@ -249,8 +249,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_07_004238) do
     t.datetime "submission_deadline"
     t.datetime "late_submission_deadline"
     t.string "internal_title"
-    t.boolean "allow_ai_comment_for_rfc", default: false, null: false
-    t.boolean "allow_ai_feedback_on_score", default: false, null: false
     t.index ["id"], name: "index_exercises_on_id"
     t.index ["id"], name: "index_unpublished_exercises", where: "(NOT unpublished)"
     t.index ["internal_title"], name: "index_exercises_on_internal_title", opclass: :gin_trgm_ops, using: :gin
