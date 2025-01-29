@@ -140,22 +140,33 @@ $(document).on('turbolinks:load', function () {
 
     function setAnnotations(editor, fileid) {
         const session = editor.getSession();
-
-        const jqrequest = $.ajax({
+        let customAnnotations = [];
+        $.ajax({
             dataType: 'json',
             method: 'GET',
             url: Routes.comments_path(),
-            data: {
-                file_id: fileid
-            }
-        });
-
-        jqrequest.done(function (response) {
+            data: { file_id: fileid }
+        }).done(function (response) {
             $.each(response, function (index, comment) {
                 comment.className = 'code-ocean_comment';
-                comment.type = 'info'; // Required for the annotation to be rendered correctly (besides being hidden through CSS).
+                comment.type = 'info'; // Required for proper rendering
+
+                comment.custom = true;
             });
-            session.setAnnotations(response);
+
+            customAnnotations.length = 0; // Clear previous custom annotations
+            customAnnotations.push(...response);
+            mergeAnnotations();
+        });
+
+        function mergeAnnotations() {
+            let existingAnnotations = session.getAnnotations().filter(ann => !ann.custom);
+            session.setAnnotations([...existingAnnotations, ...customAnnotations]);
+        }
+
+        // Ensure annotations are not overridden
+        session.on('changeAnnotation', function () {
+            mergeAnnotations();
         });
     }
 
