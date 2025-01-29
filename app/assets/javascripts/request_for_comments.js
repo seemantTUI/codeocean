@@ -65,6 +65,7 @@ $(document).on('turbolinks:load', function () {
         // set editor mode (used for syntax highlighting
         currentEditor.getSession().setMode($(editor).data('mode'));
         currentEditor.setTheme(CodeOceanEditor.THEME);
+        console.log("Hi")
 
         currentEditor.commentVisualsByLine = {};
         setAnnotations(currentEditor, $(editor).data('file-id'));
@@ -72,6 +73,7 @@ $(document).on('turbolinks:load', function () {
         currentEditor.on("guttermousemove", showPopover);
         currentEditor.getSession().setOption("useWorker", false);
         console.log(currentEditor.getSession().getOption("useWorker"));
+
 
     });
 
