@@ -70,6 +70,8 @@ $(document).on('turbolinks:load', function () {
         setAnnotations(currentEditor, $(editor).data('file-id'));
         currentEditor.on("guttermousedown", handleSidebarClick);
         currentEditor.on("guttermousemove", showPopover);
+        currentEditor.getSession().setOption("useWorker", false);
+
     });
 
     const handleAceThemeChangeEvent = function() {
@@ -140,33 +142,22 @@ $(document).on('turbolinks:load', function () {
 
     function setAnnotations(editor, fileid) {
         const session = editor.getSession();
-        let customAnnotations = [];
-        $.ajax({
+
+        const jqrequest = $.ajax({
             dataType: 'json',
             method: 'GET',
             url: Routes.comments_path(),
-            data: { file_id: fileid }
-        }).done(function (response) {
-            $.each(response, function (index, comment) {
-                comment.className = 'code-ocean_comment';
-                comment.type = 'info'; // Required for proper rendering
-
-                comment.custom = true;
-            });
-
-            customAnnotations.length = 0; // Clear previous custom annotations
-            customAnnotations.push(...response);
-            mergeAnnotations();
+            data: {
+                file_id: fileid
+            }
         });
 
-        function mergeAnnotations() {
-            let existingAnnotations = session.getAnnotations().filter(ann => !ann.custom);
-            session.setAnnotations([...existingAnnotations, ...customAnnotations]);
-        }
-
-        // Ensure annotations are not overridden
-        session.on('changeAnnotation', function () {
-            mergeAnnotations();
+        jqrequest.done(function (response) {
+            $.each(response, function (index, comment) {
+                comment.className = 'code-ocean_comment';
+                comment.type = 'info'; // Required for the annotation to be rendered correctly (besides being hidden through CSS).
+            });
+            session.setAnnotations(response);
         });
     }
 
