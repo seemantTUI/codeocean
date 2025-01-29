@@ -71,6 +71,7 @@ $(document).on('turbolinks:load', function () {
         currentEditor.on("guttermousedown", handleSidebarClick);
         currentEditor.on("guttermousemove", showPopover);
         currentEditor.getSession().setOption("useWorker", false);
+        console.log(currentEditor.getSession().getOption("useWorker"));
 
     });
 
