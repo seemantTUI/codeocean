@@ -4,7 +4,24 @@ This project integrates ChatGPT into CodeOcean to provide automated feedback for
 
 ## Prerequisites
 
-- **API Key:** Stored securely via Rails credentials
+- **API Key:** Stored securely via Rails credentials  
+  To edit the API key, use the following command:  
+  Open the rails credentials using an editor from the command line.
+  ```bash
+  EDITOR="nano" bin/rails credentials:edit
+  ```  
+  Then add the API key like this in the rails credentials:  
+  ```yaml
+  openai:
+    api_key: your_api_key
+  ```  
+  If the environment is production, use:  
+  ```bash
+  RAILS_ENV=production EDITOR="nano" bin/rails credentials:edit
+  ```  
+  and add the key.
+  
+
 - **Internal User:** Requires an internal user (`chatgpt@example.org`) to create comments
 - **Gem Required:** `gem 'ruby-openai'`
 
@@ -33,7 +50,7 @@ Responsible for formatting prompts and parsing responses.
 
 - [`app/helpers/chat_gpt_helper.rb`](app/helpers/chat_gpt_helper.rb)
 - `format_prompt`: Loads locale-specific templates and replaces placeholders in the prompt from application
-- `format_response`: Parses structured JSON response from chatGPT to create general commenta(line 0) and line comments for RFC.
+- `format_response`: Parses structured JSON response from chatGPT to create general comments (line 0) and line comments for RFC.
 
 ###  Automatic Comment Job (RFC)
 
@@ -78,5 +95,3 @@ Instructors can toggle AI features per exercise using boolean flags:
 
 - `allow_ai_comment_for_rfc`: Enables RFC-based AI feedback
 - `allow_ai_feedback_on_score`: Enables test-based feedback
-
----
