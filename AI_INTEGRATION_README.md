@@ -41,15 +41,12 @@ Encapsulates API communication with ChatGPT.
 - **Prompt files:** [`app/services/chat_gpt_service/chat_gpt_prompts/`](app/services/chat_gpt_service/chat_gpt_prompts/) (EN and DE versions)
 - **Structured Output Schema:** [`app/services/chat_gpt_service/chat_gpt_prompts/response_format.json`](app/services/chat_gpt_service/chat_gpt_prompts/response_format.json)
 
-**Key Method:**
-- `execute(prompt, structured_output)`: Sends prompt and receives response
-
 ###  ChatGPT Helper
 
 Responsible for formatting prompts and parsing responses.
 
 - [`app/helpers/chat_gpt_helper.rb`](app/helpers/chat_gpt_helper.rb)
-- `format_prompt`: Loads locale-specific templates and replaces placeholders in the prompt from application
+- `format_prompt`: Loads locale-specific prompt templates and replaces placeholders in the prompt from the application.
 - `format_response`: Parses structured JSON response from chatGPT to create general comments (line 0) and line comments for RFC.
 
 ###  Automatic Comment Job (RFC)
